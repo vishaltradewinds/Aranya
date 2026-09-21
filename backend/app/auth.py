@@ -15,13 +15,13 @@ class Role(str, Enum):
     ADMIN="ADMIN"
 
 ROLE_PERMISSIONS={
-    Role.PRODUCER: {"lot:create","lot:read:self","audit:read:self"},
-    Role.FPO: {"lot:create","lot:read:org","audit:read:org","lot:transition"},
-    Role.AGGREGATOR: {"lot:read:org","movement:create","audit:read:org","lot:transition"},
-    Role.PROCESSOR: {"lot:read:matched","order:create","audit:read:org","lot:transition"},
-    Role.BUYER: {"lot:read:market","order:create","audit:read:org","lot:transition"},
+    Role.PRODUCER: {"lot:create","lot:read","audit:read:self"},
+    Role.FPO: {"lot:create","lot:read","audit:read:org","lot:transition"},
+    Role.AGGREGATOR: {"lot:read","movement:create","audit:read:org","lot:transition"},
+    Role.PROCESSOR: {"lot:read","order:create","audit:read:org","lot:transition"},
+    Role.BUYER: {"lot:read","order:create","audit:read:org","lot:transition"},
     Role.TRANSPORTER: {"movement:read","movement:update","audit:read:assigned","lot:transition"},
-    Role.WAREHOUSE: {"lot:read:assigned","movement:update","audit:read:assigned","lot:transition"},
+    Role.WAREHOUSE: {"lot:read","movement:update","audit:read:assigned","lot:transition"},
     Role.GOVERNMENT: {"lot:read:jurisdiction","audit:read:jurisdiction"},
     Role.COMPLIANCE: {"audit:read:jurisdiction","evidence:review","lot:transition"},
     Role.RESEARCH: {"read:anonymized"},
