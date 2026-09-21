@@ -45,7 +45,9 @@ def allowed(principal:Principal, permission:str)->bool:
     return "*" in permissions or permission in permissions
 
 JWT_ALGORITHM="HS256"
-JWT_SECRET=os.getenv("ARANYA_JWT_SECRET","dev-only-change-me")
+JWT_SECRET=os.getenv("ARANYA_JWT_SECRET")
+if not JWT_SECRET:
+    raise RuntimeError("ARANYA_JWT_SECRET must be configured")
 bearer=HTTPBearer(auto_error=False)
 
 def issue_token(principal:Principal, expires_minutes:int=60)->str:
