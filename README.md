@@ -1,19 +1,31 @@
 # ARANYA
 
-ARANYA is a digital network connecting legitimate forest-produce supply, processing, logistics and markets.
+ARANYA is the digital jungle for the real-world nature-based economy.
 
-## Core principle
+## Experience
 
-**Easy for people. Rigorous underneath.**
+**Enter ARANYA. Speak. Walk. Get the work done.**
 
-The platform is designed to keep the user experience simple while maintaining strong identity, provenance, evidence, regulatory awareness, transaction records and auditability underneath.
+ARANYA adapts the experience to the stakeholder, their legitimate authority and the real task they are doing. The interface stays simple while identity, evidence, provenance, rules, matching, workflows, transactions and auditability operate underneath.
 
-## Core journey
+## Operating model
 
-Producer → Source & rights → Produce → Evidence → Eligibility → Lot → Match → Order → Movement → Processing → Delivery → Settlement → Audit
+**Network ↔ ARANYA ↔ Network**
+
+ARANYA is a Network-to-Network operating layer. Existing networks remain themselves; ARANYA connects them to other legitimate networks and stakeholders.
+
+## Real-work loop
+
+Intent → Journey → Action → Evidence → Verification → Output → Value → Settlement → Outcome
+
+A registration is not the outcome. Completed real work is.
+
+## Authority
+
+ARANYA facilitates and orchestrates. It does not replace statutory, scientific, certification or contractual authority. Authority remains contextual, scoped and attributable.
 
 ## Initial execution
 
-The first controlled real-world validation target is Jabalpur, Madhya Pradesh, with JNKVV as a potential knowledge, research and field-network partner.
+The first controlled real-world validation target remains Jabalpur, Madhya Pradesh. This is a validation node, not the center of ARANYA.
 
-No real participant onboarding should begin until the core platform passes its hardening gates.
+No uncontrolled participant onboarding should begin until the platform's hardening gates are passed.
