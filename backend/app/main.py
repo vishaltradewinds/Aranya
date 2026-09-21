@@ -18,7 +18,7 @@ class ProduceIn(BaseModel):
 class Lot(BaseModel):
     id:str; producer_id:str; product:str; species:Optional[str]; quantity_kg:float; origin_state:str; origin_district:str; source_type:str; evidence_status:EvidenceStatus; regulatory_status:LotStatus; status:LotStatus; created_at:datetime
 class TransitionIn(BaseModel):
-    target_status:LotStatus; actor:str=Field(min_length=1); reason:str=Field(min_length=1)
+    target_status:LotStatus; reason:str=Field(min_length=1)
 @app.on_event("startup")
 def startup(): init_db()
 def to_lot(r):
