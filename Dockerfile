@@ -1,7 +1,6 @@
-# Repository-level compatibility wrapper. Production image is built from backend/Dockerfile.
 FROM python:3.11-slim
 WORKDIR /app
-COPY backend/pyproject.toml .
+COPY backend/pyproject.toml ./pyproject.toml
 COPY backend/app ./app
 RUN pip install --no-cache-dir .
 EXPOSE 8000
