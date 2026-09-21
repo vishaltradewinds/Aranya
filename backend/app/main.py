@@ -8,6 +8,7 @@ from .db import SessionLocal,init_db,LotRecord,AuditRecord,LotTransitionRecord
 from .state import LotStatus,can_transition
 from .regulatory import RuleRegistry,MP_BASELINE_RULES,RegulatoryStatus,RegulatoryContext
 app=FastAPI(title="ARANYA API",version="0.3.0")
+init_db()
 registry=RuleRegistry(MP_BASELINE_RULES)
 class EvidenceStatus(str,Enum):
     CLAIMED="CLAIMED"; DOCUMENTED="DOCUMENTED"; REMOTE_VERIFIED="REMOTE_VERIFIED"; FIELD_VERIFIED="FIELD_VERIFIED"; AUTHORITY_VERIFIED="AUTHORITY_VERIFIED"; OUTCOME_VERIFIED="OUTCOME_VERIFIED"
