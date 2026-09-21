@@ -23,14 +23,15 @@ def test_evidence_chain_is_append_only_and_verifiable():
     response=client.post("/api/v1/lots",headers=auth(),json={"producer_id":"producer-001","product":"bamboo","species":"Bambusa bambos","quantity_kg":100,"origin_state":"Madhya Pradesh","origin_district":"Jabalpur","source_type":"DECLARED"})
     assert response.status_code==201
     lot=response.json()
-    evidence=client.post(f"/api/v1/lots/{lot["id"]}/evidence",headers=auth(),json={"evidence_type":"ORIGIN","source":"producer-declaration","reference":"doc://origin-001","metadata":{"note":"initial"}})
+    lot_id=lot["id"]
+    evidence=client.post(f"/api/v1/lots/{lot_id}/evidence",headers=auth(),json={"evidence_type":"ORIGIN","source":"producer-declaration","reference":"doc://origin-001","metadata":{"note":"initial"}})
     assert evidence.status_code==201
     first=evidence.json()
-    verify=client.post(f"/api/v1/evidence/{first["id"]}/verify",headers=auth(Role.COMPLIANCE,user="reviewer-001",org="org-compliance"),json={"status":"DOCUMENTED","verifier_note":"document checked"})
+    verify=client.post(f'/api/v1/evidence/{first["id"]}/verify',headers=auth(Role.COMPLIANCE,user="reviewer-001",org="org-compliance"),json={"status":"DOCUMENTED","verifier_note":"document checked"})
     assert verify.status_code==200
     second=verify.json()
     assert second["id"] != first["id"]
-    listed=client.get(f"/api/v1/lots/{lot["id"]}/evidence",headers=auth())
+    listed=client.get(f"/api/v1/lots/{lot_id}/evidence",headers=auth())
     assert listed.status_code==200
     records=listed.json()
     assert len(records)==2
