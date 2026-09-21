@@ -6,7 +6,8 @@ from datetime import datetime,timezone
 from typing import Optional
 from .db import SessionLocal,init_db,LotRecord,AuditRecord,LotTransitionRecord
 from .state import LotStatus,can_transition
-from .regulatory import RuleRegistry,MP_BASELINE_RULES,RegulatoryStatus,RegulatoryContext\nfrom .auth import Principal, require_permission
+from .regulatory import RuleRegistry,MP_BASELINE_RULES,RegulatoryStatus,RegulatoryContext
+from .auth import Principal, require_permission
 app=FastAPI(title="ARANYA API",version="0.3.0")
 init_db()
 registry=RuleRegistry(MP_BASELINE_RULES)
@@ -29,7 +30,8 @@ def health(): return {"status":"ok","service":"aranya-api","version":"0.3.0","pe
 @app.post("/api/v1/lots",response_model=Lot,status_code=201)
 def create_lot(payload:ProduceIn, principal:Principal=require_permission("lot:create")):
     with SessionLocal() as db:
-        if principal.role.value=="PRODUCER" and payload.producer_id != principal.user_id: raise HTTPException(403,"Producer identity mismatch")\n        lot_id=f"ARL-{uuid4().hex[:12].upper()}"; now=datetime.now(timezone.utc)
+        if principal.role.value=="PRODUCER" and payload.producer_id != principal.user_id: raise HTTPException(403,"Producer identity mismatch")
+        lot_id=f"ARL-{uuid4().hex[:12].upper()}"; now=datetime.now(timezone.utc)
         r=LotRecord(id=lot_id,producer_id=payload.producer_id,product=payload.product,species=payload.species,quantity_kg=payload.quantity_kg,origin_state=payload.origin_state,origin_district=payload.origin_district,source_type=payload.source_type,evidence_status="CLAIMED",regulatory_status="UNKNOWN",status="ELIGIBILITY_REVIEW",created_at=now)
         db.add(r); audit(db,"LOT_CREATED",lot_id,principal.user_id,{"status":r.status,"regulatory_status":r.regulatory_status}); db.commit(); db.refresh(r); return to_lot(r)
 @app.get("/api/v1/lots/{lot_id}",response_model=Lot)
