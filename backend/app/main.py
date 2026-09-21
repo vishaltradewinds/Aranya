@@ -33,7 +33,7 @@ def create_lot(payload:ProduceIn, principal:Principal=require_permission("lot:cr
         r=LotRecord(id=lot_id,producer_id=payload.producer_id,product=payload.product,species=payload.species,quantity_kg=payload.quantity_kg,origin_state=payload.origin_state,origin_district=payload.origin_district,source_type=payload.source_type,evidence_status="CLAIMED",regulatory_status="UNKNOWN",status="ELIGIBILITY_REVIEW",created_at=now)
         db.add(r); audit(db,"LOT_CREATED",lot_id,principal.user_id,{"status":r.status,"regulatory_status":r.regulatory_status}); db.commit(); db.refresh(r); return to_lot(r)
 @app.get("/api/v1/lots/{lot_id}",response_model=Lot)
-def get_lot(lot_id:str, principal:Principal=require_permission("lot:read:self")):
+def get_lot(lot_id:str, principal:Principal=require_permission("lot:read")):
     with SessionLocal() as db:
         r=db.get(LotRecord,lot_id)
         if not r: raise HTTPException(404,"Lot not found")
