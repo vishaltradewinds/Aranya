@@ -1,4 +1,18 @@
-from .main import LotStatus
+from enum import Enum
+
+class LotStatus(str, Enum):
+    DRAFT="DRAFT"
+    ELIGIBILITY_REVIEW="ELIGIBILITY_REVIEW"
+    TRADE_ELIGIBLE="TRADE_ELIGIBLE"
+    CONDITIONAL="CONDITIONAL"
+    HOLD="HOLD"
+    RESTRICTED="RESTRICTED"
+    UNKNOWN="UNKNOWN"
+    MATCHED="MATCHED"
+    ORDERED="ORDERED"
+    IN_TRANSIT="IN_TRANSIT"
+    DELIVERED="DELIVERED"
+    SETTLED="SETTLED"
 
 ALLOWED_TRANSITIONS={
     LotStatus.DRAFT:{LotStatus.ELIGIBILITY_REVIEW},
@@ -14,5 +28,6 @@ ALLOWED_TRANSITIONS={
     LotStatus.RESTRICTED:set(),
     LotStatus.SETTLED:set(),
 }
-def can_transition(current,target):
+
+def can_transition(current:LotStatus,target:LotStatus)->bool:
     return target in ALLOWED_TRANSITIONS.get(current,set())
