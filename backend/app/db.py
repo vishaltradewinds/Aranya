@@ -130,4 +130,33 @@ class WorkOutcomeRecord(Base):
     notes:Mapped[str|None]=mapped_column(String(1000))
     created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
 
+
+class HandoverRecord(Base):
+    __tablename__="handovers"
+    id:Mapped[str]=mapped_column(String(40),primary_key=True)
+    task_id:Mapped[str]=mapped_column(ForeignKey("work_tasks.id"),nullable=False,index=True)
+    from_party:Mapped[str]=mapped_column(String(100),nullable=False)
+    to_party:Mapped[str]=mapped_column(String(100),nullable=False)
+    quantity:Mapped[float|None]=mapped_column(Float)
+    unit:Mapped[str|None]=mapped_column(String(30))
+    evidence_id:Mapped[str|None]=mapped_column(String(40))
+    state:Mapped[str]=mapped_column(String(50),nullable=False,index=True)
+    accepted_by:Mapped[str|None]=mapped_column(String(100))
+    accepted_at:Mapped[datetime|None]=mapped_column(DateTime(timezone=True))
+    notes:Mapped[str|None]=mapped_column(String(1000))
+    created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
+class SettlementRecord(Base):
+    __tablename__="settlements"
+    id:Mapped[str]=mapped_column(String(40),primary_key=True)
+    task_id:Mapped[str]=mapped_column(ForeignKey("work_tasks.id"),nullable=False,index=True)
+    outcome_id:Mapped[str|None]=mapped_column(ForeignKey("work_outcomes.id"),nullable=True,index=True)
+    payer:Mapped[str]=mapped_column(String(100),nullable=False)
+    payee:Mapped[str]=mapped_column(String(100),nullable=False)
+    amount:Mapped[float]=mapped_column(Float,nullable=False)
+    currency:Mapped[str]=mapped_column(String(10),nullable=False,default="INR")
+    basis:Mapped[str]=mapped_column(String(500),nullable=False)
+    state:Mapped[str]=mapped_column(String(50),nullable=False,index=True)
+    reference:Mapped[str|None]=mapped_column(String(200))
+    created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
+
 def init_db(): Base.metadata.create_all(engine)
