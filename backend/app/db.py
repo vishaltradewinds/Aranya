@@ -159,4 +159,18 @@ class SettlementRecord(Base):
     reference:Mapped[str|None]=mapped_column(String(200))
     created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
 
+
+class EvidenceObjectRecord(Base):
+    __tablename__="evidence_objects"
+    id:Mapped[str]=mapped_column(String(40),primary_key=True)
+    entity_id:Mapped[str]=mapped_column(String(40),nullable=False,index=True)
+    evidence_type:Mapped[str]=mapped_column(String(50),nullable=False)
+    object_uri:Mapped[str]=mapped_column(String(1000),nullable=False)
+    content_hash:Mapped[str]=mapped_column(String(64),nullable=False,index=True)
+    mime_type:Mapped[str|None]=mapped_column(String(100))
+    size_bytes:Mapped[int|None]=mapped_column()
+    captured_by:Mapped[str]=mapped_column(String(100),nullable=False)
+    captured_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
+    storage_status:Mapped[str]=mapped_column(String(40),nullable=False)
+
 def init_db(): Base.metadata.create_all(engine)
