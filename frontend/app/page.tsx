@@ -36,15 +36,6 @@ export default function Home() {
     try { openQueue().then(db=>{dbRef.current=db; const tx=db.transaction("queue","readonly"); const req=tx.objectStore("queue").count(); req.onsuccess=()=>setQueued(req.result) }).catch(()=>{}) } catch {}\n    const sync=()=>{ setMessage("Connection restored. ARANYA will synchronise saved work when authenticated."); }\n    window.addEventListener("online",sync); return ()=>window.removeEventListener("online",sync)
   }, [])
 
-  const queueTask = (text: string) => {
-    if (!text.trim()) return
-    try {
-      const current = Number(localStorage.getItem("aranya_pending_count") || "0") + 1
-      localStorage.setItem("aranya_pending_count", String(current))
-      setQueued(current)
-    } catch {}
-  }
-
   const startVoice = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
     if (!SpeechRecognition) { setMessage("🎙️ Voice input is not available in this browser. You can type instead."); return }
@@ -83,7 +74,7 @@ export default function Home() {
     if (!file) return
     setPhotoName(file.name)
     setMessage("📷 Photo captured. ARANYA will use it as context; verification remains separate.")
-    queueTask("Photo captured: " + file.name)
+    void uploadEvidence(file)
   }
   const askAranya = async () => {
     if (!input.trim()) return
@@ -95,9 +86,12 @@ export default function Home() {
         body: JSON.stringify({ message: input, context: { selected_intent: selected } }),
       })
       const data = await response.json()
-      setAiReply(data.reply || "ARANYA could not respond yet.")
+      if (!response.ok) throw new Error(data.detail || "AI request failed")
+      setAiAvailable(Boolean(data.ai?.available ?? true))
+      setAiReply(data.ai?.reply || data.reply || "ARANYA could not respond yet.")
     } catch {
-      queueTask(input)
+      setAiAvailable(false)
+      await saveOffline("intent",{message:input,context:{selected_intent:selected}})
       setAiReply("ARANYA is offline right now. I saved this task for later synchronisation.")
     } finally { setAiBusy(false) }
   }
