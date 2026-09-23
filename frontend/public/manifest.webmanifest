@@ -1,0 +1,9 @@
+{
+  "name": "ARANYA",
+  "short_name": "ARANYA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08100a",
+  "theme_color": "#102016",
+  "description": "ARANYA — the digital jungle for real-world work."
+}
