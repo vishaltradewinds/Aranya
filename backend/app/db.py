@@ -90,4 +90,17 @@ class NetworkLinkRecord(Base):
     evidence_id:Mapped[str|None]=mapped_column(String(40))
     created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
 
+
+class JourneyRecord(Base):
+    __tablename__="journeys"
+    id:Mapped[str]=mapped_column(String(40),primary_key=True)
+    stakeholder_id:Mapped[str]=mapped_column(String(100),nullable=False,index=True)
+    intent_type:Mapped[str]=mapped_column(String(50),nullable=False,index=True)
+    journey_key:Mapped[str]=mapped_column(String(100),nullable=False,index=True)
+    state:Mapped[str]=mapped_column(String(50),nullable=False,index=True)
+    intent_payload:Mapped[dict]=mapped_column(JSON,nullable=False)
+    next_action:Mapped[str]=mapped_column(String(200),nullable=False)
+    created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
+    updated_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
+
 def init_db(): Base.metadata.create_all(engine)
