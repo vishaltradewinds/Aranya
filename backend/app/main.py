@@ -1,5 +1,7 @@
+import os
 from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel,Field
+from fastapi.middleware.cors import CORSMiddleware
 from enum import Enum
 from uuid import uuid4
 from datetime import datetime,timezone
@@ -10,7 +12,11 @@ from .evidence import EvidenceType, EvidenceStatus as EvidenceLevel
 from .regulatory import RuleRegistry,MP_BASELINE_RULES,RegulatoryStatus,RegulatoryContext
 from .auth import Principal, require_permission
 from .ai_gateway import interpret
-app=FastAPI(title="ARANYA API",version="0.3.0")
+from .ai_api import router as ai_router
+app=FastAPI(title="ARANYA API",version="0.6.0")
+allowed_origins=[x.strip() for x in os.getenv("ARANYA_ALLOWED_ORIGINS","http://localhost:3000,http://127.0.0.1:3000").split(",") if x.strip()]
+app.add_middleware(CORSMiddleware,allow_origins=allowed_origins,allow_credentials=False,allow_methods=["*"],allow_headers=["*"])
+app.include_router(ai_router)
 init_db()
 registry=RuleRegistry(MP_BASELINE_RULES)
 class EvidenceStatus(str,Enum):
@@ -39,12 +45,8 @@ class AIRequest(BaseModel):
     message: str = Field(min_length=1)
     context: dict = {}
 
-@app.post("/api/v1/ai/interpret")
-def ai_interpret(payload: AIRequest, principal: Principal = require_permission("lot:read")):
-    return interpret(payload.message, payload.context)
-
 @app.get("/health")
-def health(): return {"status":"ok","service":"aranya-api","version":"0.3.0","persistence":"sqlalchemy","regulatory_gate":True}
+def health(): return {"status":"ok","service":"aranya-api","version":"0.6.0","persistence":"sqlalchemy","regulatory_gate":True,"ai_mode":"local-first"}
 @app.post("/api/v1/lots",response_model=Lot,status_code=201)
 def create_lot(payload:ProduceIn, principal:Principal=require_permission("lot:create")):
     with SessionLocal() as db:
