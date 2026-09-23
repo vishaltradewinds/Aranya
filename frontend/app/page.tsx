@@ -29,11 +29,22 @@ export default function Home() {
   const [listening, setListening] = useState(false)
   const [photoName, setPhotoName] = useState("")
   const [queued, setQueued] = useState(0)
-  const recognitionRef = useRef<any>(null)\n  const dbRef = useRef<IDBDatabase | null>(null)
+  const recognitionRef = useRef<any>(null)
+  const dbRef = useRef<IDBDatabase | null>(null)
 
-  const openQueue = () => new Promise<IDBDatabase>((resolve,reject) => {\n    const req=indexedDB.open("aranya-offline",1)\n    req.onupgradeneeded=()=>req.result.createObjectStore("queue",{keyPath:"id",autoIncrement:true})\n    req.onsuccess=()=>resolve(req.result)\n    req.onerror=()=>reject(req.error)\n  })\n  const saveOffline = async (kind:string,payload:any) => { try { const db=dbRef.current || await openQueue(); dbRef.current=db; const tx=db.transaction("queue","readwrite"); tx.objectStore("queue").add({kind,payload,createdAt:Date.now()}); setQueued((q)=>q+1) } catch {} }\n\n  useEffect(() => {
+  const openQueue = () => new Promise<IDBDatabase>((resolve,reject) => {
+    const req=indexedDB.open("aranya-offline",1)
+    req.onupgradeneeded=()=>req.result.createObjectStore("queue",{keyPath:"id",autoIncrement:true})
+    req.onsuccess=()=>resolve(req.result)
+    req.onerror=()=>reject(req.error)
+  })
+  const saveOffline = async (kind:string,payload:any) => { try { const db=dbRef.current || await openQueue(); dbRef.current=db; const tx=db.transaction("queue","readwrite"); tx.objectStore("queue").add({kind,payload,createdAt:Date.now()}); setQueued((q)=>q+1) } catch {} }
+
+  useEffect(() => {
     if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {})
-    try { openQueue().then(db=>{dbRef.current=db; const tx=db.transaction("queue","readonly"); const req=tx.objectStore("queue").count(); req.onsuccess=()=>setQueued(req.result) }).catch(()=>{}) } catch {}\n    const sync=()=>{ setMessage("Connection restored. ARANYA will synchronise saved work when authenticated."); }\n    window.addEventListener("online",sync); return ()=>window.removeEventListener("online",sync)
+    try { openQueue().then(db=>{dbRef.current=db; const tx=db.transaction("queue","readonly"); const req=tx.objectStore("queue").count(); req.onsuccess=()=>setQueued(req.result) }).catch(()=>{}) } catch {}
+    const sync=()=>{ setMessage("Connection restored. ARANYA will synchronise saved work when authenticated."); }
+    window.addEventListener("online",sync); return ()=>window.removeEventListener("online",sync)
   }, [])
 
   const startVoice = () => {
@@ -129,10 +140,12 @@ export default function Home() {
             <label className="media-button">📷 Photo<input type="file" accept="image/*" capture="environment" onChange={handlePhoto} /></label>
             <button type="button" onClick={() => setMessage("🤝 N2N: ARANYA aapke network ko relevant network se jodne ke liye tayyar hai.")}>🤝 Connect network</button>
           </div>
-          <div className="offline-note">{queued > 0 ? "Offline queue: " + queued + " task(s) waiting" : "Offline capture ready."}{photoName ? " · " + photoName : ""}{evidenceStatus ? " · " + evidenceStatus : ""}</div>\n          {journey && <div className="journey-card"><b>Journey: {journey.key.replaceAll("_", " ")}</b><span>State: {journey.state.replaceAll("_", " ")}</span>{journey.questions?.length > 0 && <span>Next: {journey.questions[0]}</span>}<strong>{journey.next_action.replaceAll("_", " ")}</strong></div>}
+          <div className="offline-note">{queued > 0 ? "Offline queue: " + queued + " task(s) waiting" : "Offline capture ready."}{photoName ? " · " + photoName : ""}{evidenceStatus ? " · " + evidenceStatus : ""}</div>
+          {journey && <div className="journey-card"><b>Journey: {journey.key.replaceAll("_", " ")}</b><span>State: {journey.state.replaceAll("_", " ")}</span>{journey.questions?.length > 0 && <span>Next: {journey.questions[0]}</span>}<strong>{journey.next_action.replaceAll("_", " ")}</strong></div>}
           <div className="ask-row">
             <input aria-label="Tell ARANYA what you need" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") askAranya() }} placeholder="Apni baat likhiye..." />
-            <button type="button" onClick={askAranya} disabled={aiBusy}>{aiBusy ? "..." : "Batao"}</button>\n            {aiAvailable === false && <small className="ai-state">Local AI unavailable — task can still be captured.</small>}
+            <button type="button" onClick={askAranya} disabled={aiBusy}>{aiBusy ? "..." : "Batao"}</button>
+            {aiAvailable === false && <small className="ai-state">Local AI unavailable — task can still be captured.</small>}
           </div>
         </div>
         <div className="principle"><b>WALK THE ARANYA</b><span>Real work creates the record. Evidence proves it. Legitimate value can lead to settlement.</span></div>
