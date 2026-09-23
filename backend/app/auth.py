@@ -21,7 +21,7 @@ class Role(str, Enum):
     ADMIN="ADMIN"
 
 ROLE_PERMISSIONS={
-    Role.PRODUCER: {"lot:create","lot:read","audit:read:self","evidence:create","network:create","network:read"},
+    Role.PRODUCER: {"lot:create","lot:read","audit:read:self","evidence:create","network:create","network:read","journey:create","journey:read","journey:advance"},
     Role.FPO: {"lot:create","lot:read","audit:read:org","lot:transition","evidence:create","network:create","network:read","network:link"},
     Role.AGGREGATOR: {"lot:read","movement:create","audit:read:org","lot:transition","network:create","network:read","network:link"},
     Role.PROCESSOR: {"lot:read","order:create","audit:read:org","lot:transition","network:create","network:read","network:link"},
