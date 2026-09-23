@@ -22,3 +22,7 @@ test = [
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+exclude = ["alembic*"]
