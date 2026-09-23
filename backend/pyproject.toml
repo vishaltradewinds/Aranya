@@ -1,1 +1,22 @@
-[project]\nname = "aranya-api"\nversion = "0.5.0"\nrequires-python = ">=3.11"\ndependencies = ["fastapi>=0.115,<1","uvicorn[standard]>=0.30,<1","pydantic>=2.8,<3","sqlalchemy>=2.0,<3","PyJWT>=2.9,<3","alembic>=1.13,<2","psycopg[binary]>=3.2,<4"]\n[project.optional-dependencies]\ntest = ["pytest>=8,<9","httpx>=0.27,<1"]\n[tool.pytest.ini_options]\npythonpath = ["."]
+[project]
+name = "aranya-api"
+version = "0.6.0"
+requires-python = ">=3.11,<3.15"
+dependencies = [
+  "fastapi>=0.115,<1",
+  "uvicorn[standard]>=0.30,<1",
+  "pydantic>=2.8,<3",
+  "sqlalchemy>=2.0,<3",
+  "PyJWT>=2.9,<3",
+  "alembic>=1.13,<2",
+  "psycopg[binary]>=3.2,<4"
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8,<9",
+  "httpx>=0.27,<1"
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
