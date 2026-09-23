@@ -67,4 +67,27 @@ class EvidenceRecord(Base):
     metadata_json:Mapped[dict]=mapped_column(JSON,nullable=False)
     content_hash:Mapped[str]=mapped_column(String(64),nullable=False)
     captured_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
+
+class NetworkRecord(Base):
+    __tablename__="networks"
+    id:Mapped[str]=mapped_column(String(40),primary_key=True)
+    organization_id:Mapped[str|None]=mapped_column(ForeignKey("organizations.id"),nullable=True,index=True)
+    name:Mapped[str]=mapped_column(String(200),nullable=False)
+    network_type:Mapped[str]=mapped_column(String(80),nullable=False,index=True)
+    description:Mapped[str|None]=mapped_column(String(1000))
+    capabilities:Mapped[list]=mapped_column(JSON,nullable=False,default=list)
+    needs:Mapped[list]=mapped_column(JSON,nullable=False,default=list)
+    jurisdiction:Mapped[str|None]=mapped_column(String(200))
+    active:Mapped[bool]=mapped_column(Boolean,default=True,nullable=False,index=True)
+    created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
+class NetworkLinkRecord(Base):
+    __tablename__="network_links"
+    id:Mapped[str]=mapped_column(String(40),primary_key=True)
+    source_network_id:Mapped[str]=mapped_column(ForeignKey("networks.id"),nullable=False,index=True)
+    target_network_id:Mapped[str]=mapped_column(ForeignKey("networks.id"),nullable=False,index=True)
+    relation:Mapped[str]=mapped_column(String(80),nullable=False)
+    status:Mapped[str]=mapped_column(String(40),nullable=False)
+    evidence_id:Mapped[str|None]=mapped_column(String(40))
+    created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
+
 def init_db(): Base.metadata.create_all(engine)
