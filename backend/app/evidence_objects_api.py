@@ -2,7 +2,7 @@ from __future__ import annotations
 import hashlib
 from datetime import datetime, timezone
 from uuid import uuid4
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, HTTPException, UploadFile, Query
 from .auth import Principal, require_permission
 from .db import SessionLocal, EvidenceObjectRecord, EvidenceRecord
 
