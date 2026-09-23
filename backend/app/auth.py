@@ -38,6 +38,10 @@ for _role in Role:
     if _role != Role.ADMIN:
         ROLE_PERMISSIONS[_role].update({"journey:create","journey:read","journey:advance","work:create","work:read","work:update","work:outcome"})
 
+for _role in Role:
+    if _role != Role.ADMIN:
+        ROLE_PERMISSIONS[_role].update({"transaction:handover","transaction:accept","transaction:settlement"})
+
 @dataclass(frozen=True)
 class Principal:
     user_id:str
