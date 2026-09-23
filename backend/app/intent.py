@@ -49,12 +49,12 @@ def _detect_intent(message: str, selected: str | None) -> IntentType:
 
 
 def _quantity(message: str) -> str | None:
-    match = re.search(r"\\b\\d+(?:[.,]\\d+)?\\s*(?:kg|kgs|tonnes?|tons?|quintal|litre|litres|units?|truckloads?)?\\b", message.lower())
+    match = re.search(r"\b\\d+(?:[.,]\\d+)?\\s*(?:kg|kgs|kilo|kilos|kg|kgs|tonne|tonnes|tons?|quintal|litre|litres|units?|truckloads?)?\\b", message.lower())
     return match.group(0) if match else None
 
 
 def _location(message: str) -> str | None:
-    patterns = [r"(?:from|se|mein|in|at|near|जिला|में)\\s+([A-Za-z][A-Za-z .'-]{2,50})"]
+    patterns = [r"(?:from|se|mein|in|at|near|जिला|में)\s+([A-Za-z][A-Za-z .'-]{2,50})"]
     for pattern in patterns:
         m = re.search(pattern, message, re.I)
         if m:
@@ -70,7 +70,7 @@ def _object(message: str) -> str | None:
     for item in known:
         if item in low:
             return item
-    cleaned = re.sub(r"\\b(?:mere paas|mujhe chahiye|i have|i need|main kar sakta hoon|i can)\\b", "", low, flags=re.I).strip(" .,!?")
+    cleaned = re.sub(r"\b(?:mere paas|mujhe chahiye|i have|i need|main kar sakta hoon|i can)\b", "", low, flags=re.I).strip(" .,!?")
     return cleaned[:80] or None
 
 
