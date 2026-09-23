@@ -21,16 +21,16 @@ class Role(str, Enum):
     ADMIN="ADMIN"
 
 ROLE_PERMISSIONS={
-    Role.PRODUCER: {"lot:create","lot:read","audit:read:self","evidence:create"},
-    Role.FPO: {"lot:create","lot:read","audit:read:org","lot:transition","evidence:create"},
-    Role.AGGREGATOR: {"lot:read","movement:create","audit:read:org","lot:transition"},
-    Role.PROCESSOR: {"lot:read","order:create","audit:read:org","lot:transition"},
-    Role.BUYER: {"lot:read","order:create","audit:read:org","lot:transition"},
-    Role.TRANSPORTER: {"movement:read","movement:update","audit:read:assigned","lot:transition"},
-    Role.WAREHOUSE: {"lot:read","movement:update","audit:read:assigned","lot:transition"},
-    Role.GOVERNMENT: {"lot:read:jurisdiction","audit:read:jurisdiction"},
-    Role.COMPLIANCE: {"audit:read:jurisdiction","evidence:review","lot:transition"},
-    Role.RESEARCH: {"read:anonymized"},
+    Role.PRODUCER: {"lot:create","lot:read","audit:read:self","evidence:create","network:create","network:read"},
+    Role.FPO: {"lot:create","lot:read","audit:read:org","lot:transition","evidence:create","network:create","network:read","network:link"},
+    Role.AGGREGATOR: {"lot:read","movement:create","audit:read:org","lot:transition","network:create","network:read","network:link"},
+    Role.PROCESSOR: {"lot:read","order:create","audit:read:org","lot:transition","network:create","network:read","network:link"},
+    Role.BUYER: {"lot:read","order:create","audit:read:org","lot:transition","network:create","network:read","network:link"},
+    Role.TRANSPORTER: {"movement:read","movement:update","audit:read:assigned","lot:transition","network:create","network:read"},
+    Role.WAREHOUSE: {"lot:read","movement:update","audit:read:assigned","lot:transition","network:create","network:read"},
+    Role.GOVERNMENT: {"lot:read:jurisdiction","audit:read:jurisdiction","network:read"},
+    Role.COMPLIANCE: {"audit:read:jurisdiction","evidence:review","lot:transition","network:read"},
+    Role.RESEARCH: {"read:anonymized","network:create","network:read","network:link"},
     Role.ADMIN: {"*"},
 }
 
