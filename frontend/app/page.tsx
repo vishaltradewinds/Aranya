@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 const paths = [
   { key: "have", icon: "🌿", title: "Mere paas hai", text: "resource, produce, knowledge, capacity" },
@@ -23,6 +23,51 @@ export default function Home() {
   const [aiReply, setAiReply] = useState("")
   const [aiBusy, setAiBusy] = useState(false)
 
+  const [listening, setListening] = useState(false)
+  const [photoName, setPhotoName] = useState("")
+  const [queued, setQueued] = useState(0)
+  const recognitionRef = useRef<any>(null)
+
+  useEffect(() => {
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {})
+    try { setQueued(Number(localStorage.getItem("aranya_pending_count") || "0")) } catch {}
+  }, [])
+
+  const queueTask = (text: string) => {
+    if (!text.trim()) return
+    try {
+      const current = Number(localStorage.getItem("aranya_pending_count") || "0") + 1
+      localStorage.setItem("aranya_pending_count", String(current))
+      setQueued(current)
+    } catch {}
+  }
+
+  const startVoice = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) { setMessage("🎙️ Voice input is not available in this browser. You can type instead."); return }
+    if (listening) { recognitionRef.current?.stop(); return }
+    const recognition = new SpeechRecognition()
+    recognition.lang = "hi-IN"
+    recognition.interimResults = false
+    recognition.onstart = () => setListening(true)
+    recognition.onend = () => setListening(false)
+    recognition.onerror = () => { setListening(false); setMessage("🎙️ Voice could not be captured. Try again or type your message.") }
+    recognition.onresult = (event: any) => {
+      const text = event.results?.[0]?.[0]?.transcript || ""
+      setInput(text)
+      setMessage("Voice captured. Press Batao to continue.")
+    }
+    recognitionRef.current = recognition
+    recognition.start()
+  }
+
+  const handlePhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setPhotoName(file.name)
+    setMessage("📷 Photo captured. ARANYA will use it as context; verification remains separate.")
+    queueTask("Photo captured: " + file.name)
+  }
   const askAranya = async () => {
     if (!input.trim()) return
     setAiBusy(true)
@@ -35,7 +80,8 @@ export default function Home() {
       const data = await response.json()
       setAiReply(data.reply || "ARANYA could not respond yet.")
     } catch {
-      setAiReply("ARANYA is offline right now. Your task can still be captured and synced later.")
+      queueTask(input)
+      setAiReply("ARANYA is offline right now. I saved this task for later synchronisation.")
     } finally { setAiBusy(false) }
   }
 
@@ -68,10 +114,11 @@ export default function Home() {
           <div className="walk-label">YOUR NEXT STEP</div>
           <div className="walk-message">{aiReply || message || "Batao. Aaj kya karna hai?"}</div>
           <div className="walk-actions">
-            <button type="button" onClick={() => setMessage("🎙️ Boliye — apni bhasha mein. ARANYA intent samjhega.")}>🎙️ Boliye</button>
-            <button type="button" onClick={() => setMessage("📷 Photo dikhaiye — ARANYA usse context samajhne mein madad lega. Verification alag rahega.")}>📷 Photo</button>
+            <button type="button" onClick={startVoice}>{listening ? "⏹️ Sun raha hoon" : "🎙️ Boliye"}</button>
+            <label className="media-button">📷 Photo<input type="file" accept="image/*" capture="environment" onChange={handlePhoto} /></label>
             <button type="button" onClick={() => setMessage("🤝 N2N: ARANYA aapke network ko relevant network se jodne ke liye tayyar hai.")}>🤝 Connect network</button>
           </div>
+          <div className="offline-note">{queued > 0 ? "Offline queue: " + queued + " task(s) waiting" : "Offline capture ready."}{photoName ? " · " + photoName : ""}</div>
           <div className="ask-row">
             <input aria-label="Tell ARANYA what you need" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") askAranya() }} placeholder="Apni baat likhiye..." />
             <button type="button" onClick={askAranya} disabled={aiBusy}>{aiBusy ? "..." : "Batao"}</button>
