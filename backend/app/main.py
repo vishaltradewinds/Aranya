@@ -8,7 +8,7 @@ from .db import SessionLocal,init_db,LotRecord,AuditRecord,LotTransitionRecord,E
 from .state import LotStatus,can_transition
 from .evidence import EvidenceType, EvidenceStatus as EvidenceLevel
 from .regulatory import RuleRegistry,MP_BASELINE_RULES,RegulatoryStatus,RegulatoryContext
-from .auth import Principal, require_permission
+from .auth import Principal, require_permission\nfrom .ai_gateway import interpret
 app=FastAPI(title="ARANYA API",version="0.3.0")
 init_db()
 registry=RuleRegistry(MP_BASELINE_RULES)
@@ -34,7 +34,7 @@ def to_lot(r):
     return Lot(id=r.id,producer_id=r.producer_id,product=r.product,species=r.species,quantity_kg=r.quantity_kg,origin_state=r.origin_state,origin_district=r.origin_district,source_type=r.source_type,evidence_status=EvidenceStatus(r.evidence_status),regulatory_status=LotStatus(r.regulatory_status),status=LotStatus(r.status),created_at=r.created_at)
 def audit(db,action,entity_id,actor,data):
     db.add(AuditRecord(id=str(uuid4()),entity_id=entity_id,action=action,actor=actor,data=data,occurred_at=datetime.now(timezone.utc)))
-@app.get("/health")
+class AIRequest(BaseModel):\n    message:str=Field(min_length=1)\n    context:dict={}\n\n@app.post("/api/v1/ai/interpret")\ndef ai_interpret(payload:AIRequest, principal:Principal=require_permission("lot:read")):\n    return interpret(payload.message, payload.context)\n\n@app.get("/health")
 def health(): return {"status":"ok","service":"aranya-api","version":"0.3.0","persistence":"sqlalchemy","regulatory_gate":True}
 @app.post("/api/v1/lots",response_model=Lot,status_code=201)
 def create_lot(payload:ProduceIn, principal:Principal=require_permission("lot:create")):
