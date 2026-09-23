@@ -173,4 +173,8 @@ class EvidenceObjectRecord(Base):
     captured_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
     storage_status:Mapped[str]=mapped_column(String(40),nullable=False)
 
-def init_db(): Base.metadata.create_all(engine)
+def init_db():
+    # Local development may bootstrap SQLite. Production databases are migration-managed.
+    if not DATABASE_URL.startswith("sqlite") and os.getenv("ARANYA_ALLOW_CREATE_ALL","false").lower() != "true":
+        return
+    Base.metadata.create_all(engine)
