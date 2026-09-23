@@ -13,10 +13,12 @@ from .regulatory import RuleRegistry,MP_BASELINE_RULES,RegulatoryStatus,Regulato
 from .auth import Principal, require_permission
 from .ai_gateway import interpret
 from .ai_api import router as ai_router
+from .network_api import router as network_router
 app=FastAPI(title="ARANYA API",version="0.6.0")
 allowed_origins=[x.strip() for x in os.getenv("ARANYA_ALLOWED_ORIGINS","http://localhost:3000,http://127.0.0.1:3000").split(",") if x.strip()]
 app.add_middleware(CORSMiddleware,allow_origins=allowed_origins,allow_credentials=False,allow_methods=["*"],allow_headers=["*"])
 app.include_router(ai_router)
+app.include_router(network_router)
 init_db()
 registry=RuleRegistry(MP_BASELINE_RULES)
 class EvidenceStatus(str,Enum):
