@@ -103,4 +103,31 @@ class JourneyRecord(Base):
     created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
     updated_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
 
+
+class WorkTaskRecord(Base):
+    __tablename__="work_tasks"
+    id:Mapped[str]=mapped_column(String(40),primary_key=True)
+    journey_id:Mapped[str]=mapped_column(ForeignKey("journeys.id"),nullable=False,index=True)
+    network_id:Mapped[str|None]=mapped_column(ForeignKey("networks.id"),nullable=True,index=True)
+    assigned_to:Mapped[str|None]=mapped_column(String(100),nullable=True,index=True)
+    task_type:Mapped[str]=mapped_column(String(80),nullable=False,index=True)
+    title:Mapped[str]=mapped_column(String(200),nullable=False)
+    state:Mapped[str]=mapped_column(String(50),nullable=False,index=True)
+    quantity:Mapped[float|None]=mapped_column(Float)
+    unit:Mapped[str|None]=mapped_column(String(30))
+    location:Mapped[str|None]=mapped_column(String(200))
+    due_at:Mapped[datetime|None]=mapped_column(DateTime(timezone=True))
+    evidence_required:Mapped[list]=mapped_column(JSON,nullable=False,default=list)
+    created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
+    updated_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
+class WorkOutcomeRecord(Base):
+    __tablename__="work_outcomes"
+    id:Mapped[str]=mapped_column(String(40),primary_key=True)
+    task_id:Mapped[str]=mapped_column(ForeignKey("work_tasks.id"),nullable=False,index=True)
+    outcome_type:Mapped[str]=mapped_column(String(80),nullable=False)
+    state:Mapped[str]=mapped_column(String(50),nullable=False,index=True)
+    evidence_id:Mapped[str|None]=mapped_column(String(40))
+    notes:Mapped[str|None]=mapped_column(String(1000))
+    created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),nullable=False)
+
 def init_db(): Base.metadata.create_all(engine)
