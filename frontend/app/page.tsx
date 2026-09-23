@@ -29,11 +29,11 @@ export default function Home() {
   const [listening, setListening] = useState(false)
   const [photoName, setPhotoName] = useState("")
   const [queued, setQueued] = useState(0)
-  const recognitionRef = useRef<any>(null)
+  const recognitionRef = useRef<any>(null)\n  const dbRef = useRef<IDBDatabase | null>(null)
 
-  useEffect(() => {
+  const openQueue = () => new Promise<IDBDatabase>((resolve,reject) => {\n    const req=indexedDB.open("aranya-offline",1)\n    req.onupgradeneeded=()=>req.result.createObjectStore("queue",{keyPath:"id",autoIncrement:true})\n    req.onsuccess=()=>resolve(req.result)\n    req.onerror=()=>reject(req.error)\n  })\n  const saveOffline = async (kind:string,payload:any) => { try { const db=dbRef.current || await openQueue(); dbRef.current=db; const tx=db.transaction("queue","readwrite"); tx.objectStore("queue").add({kind,payload,createdAt:Date.now()}); setQueued((q)=>q+1) } catch {} }\n\n  useEffect(() => {
     if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {})
-    try { setQueued(Number(localStorage.getItem("aranya_pending_count") || "0")) } catch {}
+    try { openQueue().then(db=>{dbRef.current=db; const tx=db.transaction("queue","readonly"); const req=tx.objectStore("queue").count(); req.onsuccess=()=>setQueued(req.result) }).catch(()=>{}) } catch {}\n    const sync=()=>{ setMessage("Connection restored. ARANYA will synchronise saved work when authenticated."); }\n    window.addEventListener("online",sync); return ()=>window.removeEventListener("online",sync)
   }, [])
 
   const queueTask = (text: string) => {
@@ -75,7 +75,7 @@ export default function Home() {
       if (!response.ok) throw new Error("upload failed")
       const data = await response.json()
       setEvidenceStatus(`Evidence captured · ${data.content_hash.slice(0, 12)}…`)
-    } catch { setEvidenceStatus("Evidence saved locally for later synchronisation.") }
+    } catch { await saveOffline("photo",{name:file.name,type:file.type,blob:file}); setEvidenceStatus("Evidence saved locally for later synchronisation.") }
   }
 
   const handlePhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
