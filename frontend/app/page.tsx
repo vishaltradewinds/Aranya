@@ -22,6 +22,8 @@ export default function Home() {
   const [input, setInput] = useState("")
   const [aiReply, setAiReply] = useState("")
   const [aiBusy, setAiBusy] = useState(false)
+  const [journey, setJourney] = useState<any>(null)
+  const [aiAvailable, setAiAvailable] = useState<boolean | null>(null)
 
   const [listening, setListening] = useState(false)
   const [photoName, setPhotoName] = useState("")
@@ -73,7 +75,7 @@ export default function Home() {
     setAiBusy(true)
     setAiReply("")
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_ARANYA_API_URL || "http://localhost:8000"}/api/v1/ai/interpret`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_ARANYA_API_URL || "http://localhost:8000"}/api/v1/ai/understand`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input, context: { selected_intent: selected } }),
       })
@@ -118,10 +120,10 @@ export default function Home() {
             <label className="media-button">📷 Photo<input type="file" accept="image/*" capture="environment" onChange={handlePhoto} /></label>
             <button type="button" onClick={() => setMessage("🤝 N2N: ARANYA aapke network ko relevant network se jodne ke liye tayyar hai.")}>🤝 Connect network</button>
           </div>
-          <div className="offline-note">{queued > 0 ? "Offline queue: " + queued + " task(s) waiting" : "Offline capture ready."}{photoName ? " · " + photoName : ""}</div>
+          <div className="offline-note">{queued > 0 ? "Offline queue: " + queued + " task(s) waiting" : "Offline capture ready."}{photoName ? " · " + photoName : ""}</div>\n          {journey && <div className="journey-card"><b>Journey: {journey.key.replaceAll("_", " ")}</b><span>State: {journey.state.replaceAll("_", " ")}</span>{journey.questions?.length > 0 && <span>Next: {journey.questions[0]}</span>}<strong>{journey.next_action.replaceAll("_", " ")}</strong></div>}
           <div className="ask-row">
             <input aria-label="Tell ARANYA what you need" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") askAranya() }} placeholder="Apni baat likhiye..." />
-            <button type="button" onClick={askAranya} disabled={aiBusy}>{aiBusy ? "..." : "Batao"}</button>
+            <button type="button" onClick={askAranya} disabled={aiBusy}>{aiBusy ? "..." : "Batao"}</button>\n            {aiAvailable === false && <small className="ai-state">Local AI unavailable — task can still be captured.</small>}
           </div>
         </div>
         <div className="principle"><b>WALK THE ARANYA</b><span>Real work creates the record. Evidence proves it. Legitimate value can lead to settlement.</span></div>
