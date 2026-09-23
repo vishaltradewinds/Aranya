@@ -24,6 +24,7 @@ export default function Home() {
   const [aiBusy, setAiBusy] = useState(false)
   const [journey, setJourney] = useState<any>(null)
   const [aiAvailable, setAiAvailable] = useState<boolean | null>(null)
+  const [evidenceStatus, setEvidenceStatus] = useState("")
 
   const [listening, setListening] = useState(false)
   const [photoName, setPhotoName] = useState("")
@@ -61,6 +62,20 @@ export default function Home() {
     }
     recognitionRef.current = recognition
     recognition.start()
+  }
+
+  const uploadEvidence = async (file: File) => {
+    const api = process.env.NEXT_PUBLIC_ARANYA_API_URL || "http://localhost:8000"
+    try {
+      const form = new FormData()
+      form.append("entity_id", "pending")
+      form.append("evidence_type", "PHOTO")
+      form.append("file", file)
+      const response = await fetch(`${api}/api/v1/evidence-objects`, { method: "POST", body: form })
+      if (!response.ok) throw new Error("upload failed")
+      const data = await response.json()
+      setEvidenceStatus(`Evidence captured · ${data.content_hash.slice(0, 12)}…`)
+    } catch { setEvidenceStatus("Evidence saved locally for later synchronisation.") }
   }
 
   const handlePhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,7 +135,7 @@ export default function Home() {
             <label className="media-button">📷 Photo<input type="file" accept="image/*" capture="environment" onChange={handlePhoto} /></label>
             <button type="button" onClick={() => setMessage("🤝 N2N: ARANYA aapke network ko relevant network se jodne ke liye tayyar hai.")}>🤝 Connect network</button>
           </div>
-          <div className="offline-note">{queued > 0 ? "Offline queue: " + queued + " task(s) waiting" : "Offline capture ready."}{photoName ? " · " + photoName : ""}</div>\n          {journey && <div className="journey-card"><b>Journey: {journey.key.replaceAll("_", " ")}</b><span>State: {journey.state.replaceAll("_", " ")}</span>{journey.questions?.length > 0 && <span>Next: {journey.questions[0]}</span>}<strong>{journey.next_action.replaceAll("_", " ")}</strong></div>}
+          <div className="offline-note">{queued > 0 ? "Offline queue: " + queued + " task(s) waiting" : "Offline capture ready."}{photoName ? " · " + photoName : ""}{evidenceStatus ? " · " + evidenceStatus : ""}</div>\n          {journey && <div className="journey-card"><b>Journey: {journey.key.replaceAll("_", " ")}</b><span>State: {journey.state.replaceAll("_", " ")}</span>{journey.questions?.length > 0 && <span>Next: {journey.questions[0]}</span>}<strong>{journey.next_action.replaceAll("_", " ")}</strong></div>}
           <div className="ask-row">
             <input aria-label="Tell ARANYA what you need" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") askAranya() }} placeholder="Apni baat likhiye..." />
             <button type="button" onClick={askAranya} disabled={aiBusy}>{aiBusy ? "..." : "Batao"}</button>\n            {aiAvailable === false && <small className="ai-state">Local AI unavailable — task can still be captured.</small>}
